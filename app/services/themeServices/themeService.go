@@ -2,41 +2,101 @@ package themeServices
 
 import (
 	"encoding/json"
+	"fmt"
 	"strconv"
 	"wejh-go/app/config"
 	"wejh-go/app/models"
 	"wejh-go/config/database"
 )
 
-func CheckThemeExist(id int) error {
-	var theme models.Theme
-	result := database.DB.Model(models.Theme{}).Where("id = ?", id).First(&theme)
-	return result.Error
+func CheckThemeExist(ids ...int) error {
+	var themes []models.Theme
+	result := database.DB.Model(&models.Theme{}).Where("id IN ?", ids).Find(&themes)
+	if result.Error != nil {
+		return result.Error
+	}
+	if len(themes) != len(ids) {
+		return fmt.Errorf("some theme IDs do not exist")
+	}
+	return nil
 }
 
-func CreateTheme(record models.Theme) error {
+func CreateTheme(themeName, themeType string, hasDarkMode bool, themeConfigData models.ThemeConfigData) error {
+	themeConfig, err := json.Marshal(themeConfigData)
+	if err != nil {
+		return err
+	}
+	record := models.Theme{
+		Name:        themeName,
+		Type:        themeType,
+		IsDarkMode:  hasDarkMode,
+		ThemeConfig: string(themeConfig),
+	}
 	result := database.DB.Create(&record)
 	return result.Error
 }
 
-func UpdateTheme(id int, record models.Theme) error {
-	result := database.DB.Model(models.Theme{}).Where(&models.Theme{ID: id}).Updates(&record)
+func UpdateTheme(themeID int, themeName string, hasDarkMode bool, themeConfigData models.ThemeConfigData) error {
+	themeConfig, err := json.Marshal(themeConfigData)
+	if err != nil {
+		return err
+	}
+	record := models.Theme{
+		Name:        themeName,
+		IsDarkMode:  hasDarkMode,
+		ThemeConfig: string(themeConfig),
+	}
+	result := database.DB.Model(models.Theme{}).Where(&models.Theme{ID: themeID}).Updates(&record)
 	return result.Error
 }
 
-func GetThemeByID(id int) (models.Theme, error) {
+func GetThemeByID(id int) (map[string]interface{}, string, bool, error) {
 	var record models.Theme
 	result := database.DB.Model(models.Theme{}).Where(&models.Theme{ID: id}).First(&record)
-	return record, result.Error
+
+	var themeConfig models.ThemeConfigData
+	if err := json.Unmarshal([]byte(record.ThemeConfig), &themeConfig); err != nil {
+		return nil, "", false, err
+	}
+
+	parsedTheme := map[string]interface{}{
+		"name":         record.Name,
+		"id":           record.ID,
+		"theme_config": themeConfig,
+		"type":         record.Type,
+		"is_dark_mode": record.IsDarkMode,
+	}
+	return parsedTheme, record.Type, record.IsDarkMode, result.Error
 }
 
-func GetThemes() ([]models.Theme, error) {
+func GetThemes() ([]map[string]interface{}, error) {
 	var themes []models.Theme
 	result := database.DB.Model(models.Theme{}).Find(&themes)
-	return themes, result.Error
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	var parsedThemes []map[string]interface{}
+
+	for _, theme := range themes {
+		var themeConfig models.ThemeConfigData
+		if err := json.Unmarshal([]byte(theme.ThemeConfig), &themeConfig); err != nil {
+			return nil, err
+		}
+
+		parsedTheme := map[string]interface{}{
+			"name":         theme.Name,
+			"theme_id":     theme.ID,
+			"theme_config": themeConfig,
+			"is_dark_mode": theme.IsDarkMode,
+		}
+		parsedThemes = append(parsedThemes, parsedTheme)
+	}
+
+	return parsedThemes, nil
 }
 
-func DeleteTheme(id int, themeType string) error {
+func DeleteTheme(id int, themeType string, isDarkMode bool) error {
 	tx := database.DB.Begin()
 	if err := tx.Delete(&models.Theme{}, id).Error; err != nil {
 		tx.Rollback()
@@ -65,9 +125,13 @@ func DeleteTheme(id int, themeType string) error {
 		defaultThemeID = theme.ID
 	}
 
+	updateField := "current_theme_id"
+	if isDarkMode {
+		updateField = "current_theme_dark_id"
+	}
 	if err := tx.Model(&models.ThemePermission{}).
-		Where("current_theme_id = ?", id).
-		Update("current_theme_id", defaultThemeID).Error; err != nil {
+		Where(updateField+" = ?", id).
+		Update(updateField, defaultThemeID).Error; err != nil {
 		tx.Rollback()
 		return err
 	}

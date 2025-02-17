@@ -6,7 +6,6 @@ import (
 	"time"
 	"wejh-go/app/apiException"
 	"wejh-go/app/config"
-	"wejh-go/app/models"
 	"wejh-go/app/services/themeServices"
 	"wejh-go/app/utils"
 )
@@ -26,16 +25,17 @@ func Info(c *gin.Context) {
 		week = -1
 	}
 
-	var defaultTheme models.Theme
+	var themeType string
+	var defaultTheme map[string]interface{}
 	if defaultThemeIDStr != "" {
 		defaultThemeID, err := strconv.Atoi(defaultThemeIDStr)
 		if err == nil {
-			defaultTheme, err = themeServices.GetThemeByID(defaultThemeID)
+			defaultTheme, themeType, _, err = themeServices.GetThemeByID(defaultThemeID)
 			if err != nil {
 				_ = c.AbortWithError(200, apiException.ServerError)
 				return
 			}
-			if defaultTheme.Type != "all" {
+			if themeType != "all" {
 				_ = c.AbortWithError(200, apiException.ServerError)
 				return
 			}
