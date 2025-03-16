@@ -19,7 +19,7 @@ const (
 	ElectricityConsumption YxyApi = "api/v1/electricity/usage-records"
 	BusAuth                YxyApi = "api/v1/bus/auth"
 	BusInfo                YxyApi = "api/v1/bus/info"
-	BusRecords             YxyApi = "api/v1/bus/records"
+	BusRecords             YxyApi = "api/v1/bus/record"
 	BusQrCode              YxyApi = "api/v1/bus/qrcode"
 	BusMessage             YxyApi = "api/v1/bus/message"
 )

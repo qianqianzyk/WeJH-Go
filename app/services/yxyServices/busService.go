@@ -27,12 +27,13 @@ type busResp struct {
 			ID            string `json:"id" mapstructure:"id"`
 			DepartureTime string `json:"departure_time" mapstructure:"departure_time"`
 			RemainSeats   int    `json:"remain_seats" mapstructure:"remain_seats"`
+			OrderedSeats  int    `json:"ordered_seats" mapstructure:"ordered_seats"`
 		}
 	} `json:"list" mapstructure:"list"`
 }
 
 type busQrCodeResp struct {
-	QrCode string `json:"qr_code" mapstructure:"qr_code"`
+	QrCode string `json:"qrcode" mapstructure:"qrcode"`
 }
 
 type BusMessagw struct {
