@@ -36,7 +36,7 @@ type busQrCodeResp struct {
 	QrCode string `json:"qrcode" mapstructure:"qrcode"`
 }
 
-type BusMessagw struct {
+type busMessageResp struct {
 	List []struct {
 		ID      string `json:"id"`
 		MsgType string `json:"msg_type"`
@@ -47,6 +47,15 @@ type BusMessagw struct {
 		HTML    string `json:"html"`
 		Img     string `json:"img"`
 		Author  string `json:"author"`
+	} `json:"list" mapstructure:"list"`
+}
+
+type busRecordResp struct {
+	List []struct {
+		ID            string `json:"id" mapstructure:"id"`
+		Name          string `json:"name" mapstructure:"name"`
+		PayTime       string `json:"pay_time" mapstructure:"pay_time"`
+		DepartureTime string `json:"departure_time" mapstructure:"departure_time"`
 	} `json:"list" mapstructure:"list"`
 }
 
@@ -99,7 +108,7 @@ func BusInfo(page, pageSize, search string) (*busResp, error) {
 	return &data, nil
 }
 
-func BusRecords(token, page, pageSize, status string) (*busResp, error) {
+func BusRecords(token, page, pageSize, status string) (*busRecordResp, error) {
 	params := url.Values{}
 	Url, err := url.Parse(string(yxyApi.BusRecords))
 	if err != nil {
@@ -122,7 +131,7 @@ func BusRecords(token, page, pageSize, status string) (*busResp, error) {
 		return nil, apiException.ServerError
 	}
 
-	var data busResp
+	var data busRecordResp
 	err = mapstructure.Decode(resp.Data, &data)
 	if err != nil {
 		return nil, err
@@ -158,7 +167,7 @@ func BusQrcode(token string) (*busQrCodeResp, error) {
 	return &data, nil
 }
 
-func BusMessage(token, page, pageSize string) (*BusMessagw, error) {
+func BusMessage(token, page, pageSize string) (*busMessageResp, error) {
 	params := url.Values{}
 	Url, err := url.Parse(string(yxyApi.BusMessage))
 	if err != nil {
@@ -180,7 +189,7 @@ func BusMessage(token, page, pageSize string) (*BusMessagw, error) {
 		return nil, apiException.ServerError
 	}
 
-	var data BusMessagw
+	var data busMessageResp
 	err = mapstructure.Decode(resp.Data, &data)
 	if err != nil {
 		return nil, err
