@@ -28,7 +28,7 @@ type busResp struct {
 			DepartureTime string `json:"departure_time" mapstructure:"departure_time"`
 			RemainSeats   int    `json:"remain_seats" mapstructure:"remain_seats"`
 			OrderedSeats  int    `json:"ordered_seats" mapstructure:"ordered_seats"`
-		}
+		} `json:"bus_time" mapstructure:"bus_time"`
 	} `json:"list" mapstructure:"list"`
 }
 
