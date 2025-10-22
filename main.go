@@ -25,8 +25,6 @@ import (
 )
 
 func main() {
-
-	config.Init()
 	if err := logger.Init(); err != nil {
 		log.Fatal(err.Error())
 	}
