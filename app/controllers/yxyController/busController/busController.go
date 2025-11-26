@@ -18,12 +18,12 @@ func GetBusInfo(c *gin.Context) {
 	var req getBusInfoRequest
 	err := c.ShouldBindQuery(&req)
 	if err != nil {
-		_ = c.AbortWithError(200, apiException.ParamError)
+		apiException.AbortWithException(c, apiException.ParamError, err)
 		return
 	}
 	busInfo, err := yxyServices.GetBusInfo(req.Page, req.PageSize, req.Search)
 	if err != nil {
-		_ = c.AbortWithError(200, apiException.ServerError)
+		apiException.AbortWithException(c, apiException.ServerError, err)
 		return
 	}
 	utils.JsonSuccessResponse(c, busInfo)
