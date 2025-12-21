@@ -46,6 +46,8 @@ func funcRouterInit(r *gin.RouterGroup) {
 		bus := fun.Group("/bus", midwares.CheckLogin)
 		{
 			bus.GET("/info", busController.GetBusInfo)
+			bus.GET("/announcement", busController.GetBusAnnouncement)
+			bus.GET("/config", busController.GetBusConfig)
 		}
 
 		card := fun.Group("/card", midwares.CheckLogin)
