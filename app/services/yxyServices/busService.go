@@ -53,11 +53,11 @@ type BusAnnouncementResp struct {
 	UpdatedAt string `json:"updated_at" mapstructure:"updated_at"`
 	Total     int    `json:"total" mapstructure:"total"`
 	List      []struct {
-		Title       string `json:"title" mapstructure:"title"`
-		Author      string `json:"author" mapstructure:"author"`
-		PublishedAt string `json:"published_at" mapstructure:"published_at"`
-		Abstract    string `json:"abstract" mapstructure:"abstract"`
-		Content     string `json:"content" mapstructure:"content"`
+		Title       string   `json:"title" mapstructure:"title"`
+		Author      string   `json:"author" mapstructure:"author"`
+		PublishedAt string   `json:"published_at" mapstructure:"published_at"`
+		Abstract    string   `json:"abstract" mapstructure:"abstract"`
+		Content     []string `json:"content" mapstructure:"content"`
 	} `json:"list" mapstructure:"list"`
 }
 
