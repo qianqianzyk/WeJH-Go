@@ -3,7 +3,6 @@ package zfController
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"time"
 	"wejh-go/app/apiException"
 	"wejh-go/app/services/funnelServices"
@@ -12,6 +11,8 @@ import (
 	"wejh-go/app/utils"
 	"wejh-go/app/utils/circuitBreaker"
 	"wejh-go/config/redis"
+
+	"github.com/gin-gonic/gin"
 )
 
 type form struct {
